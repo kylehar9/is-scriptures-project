@@ -16,7 +16,10 @@ const Scriptures = (function () {
 
     /*===========================================================
     *CONSTANTS */
-
+    const URL_BASE = "https://scriptures.byu.edu/";
+    const URL_BOOKS = `${URL_BASE}mapscrip/model/books.php`;
+    const URL_VOLUMES = `${URL_BASE}mapscrip/model/volumes.php`;
+    
     /*===========================================================
     *PRIVATE VARIABLES */
     let books;
