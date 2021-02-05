@@ -20,6 +20,15 @@ const Scriptures = (function () {
   const URL_BASE = "https://scriptures.byu.edu/";
   const URL_BOOKS = `${URL_BASE}mapscrip/model/books.php`;
   const URL_VOLUMES = `${URL_BASE}mapscrip/model/volumes.php`;
+  const BOTTOM_PADDING = "<br /><br />";
+  const CLASS_BOOKS = "books";
+  const CLASS_VOLUME = "volume";
+  const DIV_SCRIPTURES_NAVIGATOR = "scripnav";
+  const DIV_SCRIPTURES = "scriptures";
+  const REQUEST_GET = "GET";
+  const REQUEST_STATUS_OK = 200;
+  const REQUEST_STATUS_ERROR = 400;
+  const TAG_HEADERS = "h5";
 
   /* ===========================================================
    *                    PRIVATE VARIABLES
@@ -31,18 +40,24 @@ const Scriptures = (function () {
    *                    PRIVATE METHOD DECLARATIONS
    */
   let ajax;
-  let init;
   let cacheBooks;
+  let htmlAnchor;
+  let htmlDiv;
+  let htmlElement;
+  let htmlLink;
+  let htmlHashLink;
+  let init;
+  let onHashChanged;
 
   /* ===========================================================
    *                    PRIVATE METHODS
    */
   ajax = function (url, successCallback, failureCallback) {
     const request = new XMLHttpRequest();
-    request.open("GET", url, true);
+    request.open(REQUEST_GET, url, true);
 
     request.onload = function () {
-      if (request.status >= 200 && request.status < 400) {
+      if (request.status >= REQUEST_STATUS_OK && request.status < REQUEST_STATUS_ERROR) {
         const data = JSON.parse(request.response);
 
         if (typeof successCallback === "function") {
@@ -76,6 +91,64 @@ const Scriptures = (function () {
       callback();
     }
   };
+
+  htmlAnchor = function (volume) {
+    return `<a name="v${volume.id}" />`;
+  };
+
+  htmlDiv = function (parameters) {
+    let classString = "";
+    let contentString = "";
+    let idString = "";
+
+    if (parameters.classKey !== undefined) {
+      classString = ` class="${parameters.classKey}"`;
+    }
+
+    if (parameters.content !== undefined) {
+      contentString = parameters.content;
+    }
+
+    if (parameters.id !== undefined) {
+      idString = ` id="${parameters.id}"`;
+    }
+
+    return `<div${idString}${classString}>${contentString}</div>`;
+  };
+
+  htmlElement = function (tagName, content) {
+    return `<${tagName}>${content}</${tagName}>`;
+  };
+
+  htmlLink = function (parameters) {
+    let classString = "";
+    let contentString = "";
+    let hrefString = "";
+    let idString = "";
+
+    if (parameters.classKey !== undefined) {
+      classString = ` class="${parameters.classKey}"`;
+    }
+
+    if (parameters.classKey !== undefined) {
+      contentString = parameters.content;
+    }
+
+    if (parameters.classKey !== undefined) {
+      hrefString = ` href="${parameters.href}"`;
+    }
+
+    if (parameters.classKey !== undefined) {
+      idString = ` id="${parameters.id}"`;
+    }
+
+    return `<a${idString}${classString}${hrefString}>${contentString}</a>`;
+  };
+
+  htmlHashLink = function (hashArguments, content) {
+    return `<a href="javascript:void(0)" onclick="changeHash(${hashArguments})">${content}</a>`;
+  };
+
   init = function (callback) {
     let booksLoaded = false;
     let volumesLoaded = false;
@@ -100,11 +173,17 @@ const Scriptures = (function () {
     }
     );
   };
+
+  onHashChanged = function () {
+    console.log(window.location.hash);
+  };
+
   /* ===========================================================
    *                        PUBLIC API
    */
 
   return {
-    init
+    init,
+    onHashChanged
   };
 }());
