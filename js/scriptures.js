@@ -277,7 +277,7 @@ const Scriptures = (function () {
     let gridContent = "";
 
     volumes.forEach(function (volume) {
-      if (volumeId === undefined || volume === volume.id) {
+      if (volumeId === undefined || volumeId === volume.id) {
         gridContent += htmlDiv({
           classKey: CLASS_VOLUME,
           content: htmlAnchor(volume) + htmlElement(TAG_HEADERS, volume.fullName)
