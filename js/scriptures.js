@@ -17,19 +17,21 @@ const Scriptures = (function () {
   /* ===========================================================
    *                    CONSTANTS
    */
-  const URL_BASE = "https://scriptures.byu.edu/";
-  const URL_BOOKS = `${URL_BASE}mapscrip/model/books.php`;
+  const BOTTOM_PADDING = "<br /><br />";
   const CLASS_BOOKS = "books";
   const CLASS_BUTTON = "btn";
+  const CLASS_CHAPTER = "chapter";
   const CLASS_VOLUME = "volume";
-  const URL_VOLUMES = `${URL_BASE}mapscrip/model/volumes.php`;
-  const BOTTOM_PADDING = "<br /><br />";
   const DIV_SCRIPTURES_NAVIGATOR = "scripnav";
   const DIV_SCRIPTURES = "scriptures";
   const REQUEST_GET = "GET";
   const REQUEST_STATUS_OK = 200;
   const REQUEST_STATUS_ERROR = 400;
   const TAG_HEADERS = "h5";
+  const URL_BASE = "https://scriptures.byu.edu/";
+  const URL_BOOKS = `${URL_BASE}mapscrip/model/books.php`;
+  const URL_SCRIPTURES = `${URL_BASE}mapscrip/mapgetscrip.php`;
+  const URL_VOLUMES = `${URL_BASE}mapscrip/model/volumes.php`;
 
   /* ===========================================================
    *                    PRIVATE VARIABLES
@@ -44,7 +46,12 @@ const Scriptures = (function () {
   let bookChapterValid;
   let booksGrid;
   let booksGridContent;
+  let chaptersGrid;
+  let chaptersGridContent;
   let cacheBooks;
+  let encodedScripturesUrlParameters;
+  let getScripturesCallback;
+  let getScripturesFailure;
   let htmlAnchor;
   let htmlDiv;
   let htmlElement;
@@ -60,13 +67,17 @@ const Scriptures = (function () {
   /* ===========================================================
    *                    PRIVATE METHODS
    */
-  ajax = function (url, successCallback, failureCallback) {
+  ajax = function (url, successCallback, failureCallback, skipJsonParse) {
     const request = new XMLHttpRequest();
     request.open(REQUEST_GET, url, true);
 
     request.onload = function () {
       if (request.status >= REQUEST_STATUS_OK && request.status < REQUEST_STATUS_ERROR) {
-        const data = JSON.parse(request.response);
+        const data = (
+          skipJsonParse
+            ? request.response
+            : JSON.parse(request.response)
+        );
 
         if (typeof successCallback === "function") {
           successCallback(data);
@@ -118,6 +129,34 @@ const Scriptures = (function () {
     return gridContent;
   };
 
+  chaptersGrid = function (book) {
+    return htmlDiv({
+      classKey: CLASS_VOLUME,
+      content: htmlElement(TAG_HEADERS, book.fullName)
+    }) + htmlDiv({
+      classKey: CLASS_BOOKS,
+      content: chaptersGridContent(book)
+    });
+  };
+
+  chaptersGridContent = function (book) {
+    let gridContent = "";
+    let chapter = 1;
+
+    while (chapter <= book.numChapters) {
+      gridContent += htmlLink({
+        classKey: `${CLASS_BUTTON} ${CLASS_CHAPTER}`,
+        id: chapter,
+        href: `#0:${book.id}:${chapter}`,
+        content: chapter
+      });
+
+      chapter += 1;
+    }
+
+    return gridContent;
+  };
+
   cacheBooks = function (callback) {
     volumes.forEach(function (volume) {
       let volumeBooks = [];
@@ -134,6 +173,32 @@ const Scriptures = (function () {
     if (typeof callback === "function") {
       callback();
     }
+  };
+
+  encodedScripturesUrlParameters = function (bookId, chapter, verses, isJst) {
+    if (bookId !== undefined && chapter !== undefined) {
+      let options = "";
+
+      if (verses !== undefined) {
+        options += verses;
+      }
+
+      if (isJst !== undefined) {
+        options += "&jst=JST";
+      }
+
+      return `${URL_SCRIPTURES}?book=${bookId}&chap=${chapter}&verses${options}`;
+    }
+  };
+
+  getScripturesCallback = function (chapterHtml) {
+    document.getElementById(DIV_SCRIPTURES).innerHTML = chapterHtml;
+
+    // TO-DO: setupMarkers()
+  };
+
+  getScripturesFailure = function () {
+    document.getElementById(DIV_SCRIPTURES).innerHTML = "Unable to retrieve chapter contents.";
   };
 
   htmlAnchor = function (volume) {
@@ -219,11 +284,20 @@ const Scriptures = (function () {
   };
 
   navigateBook = function (bookId) {
-    console.log("navigateBook " + bookId);
+    let book = books[bookId];
+
+    if (book.numChapters <= 1) {
+      navigateChapter(bookId, book.numChapters);
+    } else {
+      document.getElementById(DIV_SCRIPTURES).innerHTML = htmlDiv({
+        id: DIV_SCRIPTURES_NAVIGATOR,
+        content: chaptersGrid(book)
+      });
+    }
   };
 
   navigateChapter = function (bookId, chapter) {
-    console.log("navigateChapter " + bookId + ", " + chapter);
+    ajax(encodedScripturesUrlParameters(bookId, chapter), getScripturesCallback, getScripturesFailure, true);
   };
 
   navigateHome = function (volumeId) {
@@ -287,7 +361,7 @@ const Scriptures = (function () {
       }
     });
 
-    return gridContent;
+    return gridContent + BOTTOM_PADDING;
   };
 
   /* ===========================================================
