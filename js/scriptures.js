@@ -24,6 +24,11 @@ const Scriptures = (function () {
   const CLASS_VOLUME = "volume";
   const DIV_SCRIPTURES_NAVIGATOR = "scripnav";
   const DIV_SCRIPTURES = "scriptures";
+  const INDEX_PLACENAME = 2;
+  const INDEX_FLAG = 11;
+  const INDEX_LATITUDE = 3;
+  const INDEX_LONGITUDE = 4;
+  const LAT_LON_PARSER = /\((.*),'(.*)',(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*),'(.*)'\)/;
   const REQUEST_GET = "GET";
   const REQUEST_STATUS_OK = 200;
   const REQUEST_STATUS_ERROR = 400;
@@ -37,11 +42,13 @@ const Scriptures = (function () {
    *                    PRIVATE VARIABLES
    */
   let books;
+  let gmMarkers = [];
   let volumes;
 
   /* ===========================================================
    *                    PRIVATE METHOD DECLARATIONS
    */
+  let addMarker;
   let ajax;
   let bookChapterValid;
   let booksGrid;
@@ -49,6 +56,7 @@ const Scriptures = (function () {
   let chaptersGrid;
   let chaptersGridContent;
   let cacheBooks;
+  let clearMarkers;
   let encodedScripturesUrlParameters;
   let getScripturesCallback;
   let getScripturesFailure;
@@ -64,37 +72,55 @@ const Scriptures = (function () {
   let nextChapter;
   let previousChapter;
   let onHashChanged;
+  let setupMarkers;
+  let showLocation;
   let titleForBookChapter;
   let volumesGridContent;
 
   /* ===========================================================
    *                    PRIVATE METHODS
    */
-  ajax = function (url, successCallback, failureCallback, skipJsonParse) {
-    const request = new XMLHttpRequest();
-    request.open(REQUEST_GET, url, true);
 
-    request.onload = function () {
-      if (request.status >= REQUEST_STATUS_OK && request.status < REQUEST_STATUS_ERROR) {
-        const data = (
-          skipJsonParse
-            ? request.response
-            : JSON.parse(request.response)
-        );
+  addMarker = function (placename, latitude, longitude) {
+    //TO-DO: Check to see if we already have this latitude/longitude in gmMarkers array
+    //Add marker to gmMarkers array only if we don't already have one for that location
+    let marker = new google.maps.Marker({
+      position: {lat: Number(latitude), lng: Number(longitude)},
+      map,
+      title: placename,
+      animation: google.maps.Animation.DROP
+    });
 
-        if (typeof successCallback === "function") {
-          successCallback(data);
+    // Name we are trying to use... do I already have a name for that marker?
+    // Use a substring and compare whether that name is already in there
+    gmMarkers.push(marker);
+  },
+
+    ajax = function (url, successCallback, failureCallback, skipJsonParse) {
+      const request = new XMLHttpRequest();
+      request.open(REQUEST_GET, url, true);
+
+      request.onload = function () {
+        if (request.status >= REQUEST_STATUS_OK && request.status < REQUEST_STATUS_ERROR) {
+          const data = (
+            skipJsonParse
+              ? request.response
+              : JSON.parse(request.response)
+          );
+
+          if (typeof successCallback === "function") {
+            successCallback(data);
+          }
+        } else {
+          if (typeof failureCallback === "function") {
+            failureCallback(request);
+          }
         }
-      } else {
-        if (typeof failureCallback === "function") {
-          failureCallback(request);
-        }
-      }
+      };
+
+      request.onerror = failureCallback;
+      request.send();
     };
-
-    request.onerror = failureCallback;
-    request.send();
-  };
 
   bookChapterValid = function (bookId, chapter) {
     let book = books[bookId];
@@ -178,26 +204,34 @@ const Scriptures = (function () {
     }
   };
 
-  encodedScripturesUrlParameters = function (bookId, chapter, verses, isJst) {
-    if (bookId !== undefined && chapter !== undefined) {
-      let options = "";
+  clearMarkers = function () {
+    gmMarkers.forEach(function (marker) {
+      marker.setMap(null);
+    });
 
-      if (verses !== undefined) {
-        options += verses;
+    gmMarkers = [];
+  },
+
+    encodedScripturesUrlParameters = function (bookId, chapter, verses, isJst) {
+      if (bookId !== undefined && chapter !== undefined) {
+        let options = "";
+
+        if (verses !== undefined) {
+          options += verses;
+        }
+
+        if (isJst !== undefined) {
+          options += "&jst=JST";
+        }
+
+        return `${URL_SCRIPTURES}?book=${bookId}&chap=${chapter}&verses${options}`;
       }
-
-      if (isJst !== undefined) {
-        options += "&jst=JST";
-      }
-
-      return `${URL_SCRIPTURES}?book=${bookId}&chap=${chapter}&verses${options}`;
-    }
-  };
+    };
 
   getScripturesCallback = function (chapterHtml) {
     document.getElementById(DIV_SCRIPTURES).innerHTML = chapterHtml;
 
-    // TO-DO: setupMarkers()
+    setupMarkers();
   };
 
   getScripturesFailure = function () {
@@ -305,10 +339,10 @@ const Scriptures = (function () {
 
   navigateHome = function (volumeId) {
     document.getElementById(DIV_SCRIPTURES).innerHTML =
-    htmlDiv({
-      id: DIV_SCRIPTURES_NAVIGATOR,
-      content: volumesGridContent(volumeId)
-    });
+      htmlDiv({
+        id: DIV_SCRIPTURES_NAVIGATOR,
+        content: volumesGridContent(volumeId)
+      });
   };
 
   onHashChanged = function () {
@@ -406,15 +440,45 @@ const Scriptures = (function () {
     }
   };
 
-  titleForBookChapter = function (book, chapter) {
-    if (book !== undefined) {
-      if (chapter > 0) {
-        return `${book.tocName} ${chapter}`;
-      }
-
-      return book.tocName;
+  setupMarkers = function () {
+    if (gmMarkers.length > 0) {
+      clearMarkers();
     }
-  };
+
+    document.querySelectorAll("a[onclick^=\"showLocation(\"]").forEach(function (element) {
+      let matches = LAT_LON_PARSER.exec(element.getAttribute("onclick"))
+    
+      if (matches) {
+        let placename = matches[INDEX_PLACENAME];
+        let latitude = matches[INDEX_LATITUDE];
+        let longitude = matches[INDEX_LONGITUDE];
+        let flag = matches[INDEX_FLAG];
+
+
+        if (flag !== "") {
+          placename = `${placename} ${flag}`;
+        }
+
+        addMarker(placename, latitude, longitude);
+
+      }
+    });
+
+  },
+
+  showLocation = function (geotagId, placename, latitude, longitude, viewLatitude, viewLongitude, viewTilt, viewRoll, viewAltitude, viewHeading) {
+    console.log(geotagId, placename, latitude);
+  },
+
+    titleForBookChapter = function (book, chapter) {
+      if (book !== undefined) {
+        if (chapter > 0) {
+          return `${book.tocName} ${chapter}`;
+        }
+
+        return book.tocName;
+      }
+    };
 
   volumesGridContent = function (volumeId) {
     let gridContent = "";
@@ -439,6 +503,7 @@ const Scriptures = (function () {
 
   return {
     init,
-    onHashChanged
+    onHashChanged,
+    showLocation
   };
 }());
