@@ -1,5 +1,13 @@
 # Project 1 Learning Notes
-> Note: I think this is a really cool project.  Dr. Liddle has done an amazing job and I feel quite lucky to be able to learn how to recreate this project under his direction.
+> Note: I think this is a really cool project.  Dr. Liddle has done an amazing job at creating this and teaching us how to do it ourselves.
+## Things I accomplished
+- Implementing previous & next chapter buttons, dynamically handling when each of those buttons is displayed if clicking them wouldn't make sense (e.g., clicking "Previous" in Genesis 1)
+- Loading Google Map via the API
+- Preventing placing duplicate markers on the map when the same location is repeated multiple times in a chapter
+- Zooming to an appropriate altitude to view all markers in one screen
+- Adjust the map zoom to view a single marker if clicked on the 'a' tag in the scripture verse or the marker on the map
+
+## Lessons learned
 - Using const declarations for constant variables is much better than having "magic" values within the code.
 - Even if there are easier ways to shorten the written code (e.g., multiple `if` statments), it may still be a good idea to write it all out in order to make it more understandable for me in the future.
     - I.e., I should "be nice to \[myself\]".
