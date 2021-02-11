@@ -548,7 +548,7 @@ const Scriptures = (function () {
   };
 
   showLocation = function (geotagId, placename, latitude, longitude, viewLatitude, viewLongitude, viewTilt, viewRoll, viewAltitude, viewHeading) {
-    map.setZoom(viewAltitude);
+    map.setZoom(10);
     map.setCenter({ lat: latitude, lng: longitude });
   };
 
