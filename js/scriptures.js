@@ -32,6 +32,7 @@ const Scriptures = (function () {
   const REQUEST_GET = "GET";
   const REQUEST_STATUS_OK = 200;
   const REQUEST_STATUS_ERROR = 400;
+  const SINGLE_BOTTOM_PADDING = "<br />";
   const TAG_HEADERS = "h5";
   const URL_BASE = "https://scriptures.byu.edu/";
   const URL_BOOKS = `${URL_BASE}mapscrip/model/books.php`;
@@ -85,7 +86,7 @@ const Scriptures = (function () {
     //TO-DO: Check to see if we already have this latitude/longitude in gmMarkers array
     //Add marker to gmMarkers array only if we don't already have one for that location
     let marker = new google.maps.Marker({
-      position: {lat: Number(latitude), lng: Number(longitude)},
+      position: { lat: Number(latitude), lng: Number(longitude) },
       map,
       title: placename,
       animation: google.maps.Animation.DROP
@@ -229,7 +230,53 @@ const Scriptures = (function () {
     };
 
   getScripturesCallback = function (chapterHtml) {
+
+    let ids = [];
+    let prevChap;
+    let nextChap;
+    let buttonSpacer = " | ";
+    let prevButtonHTML;
+    let nextButtonHTML;
+
+    ids = location.hash.slice(1).split(":")
+
+    prevChap = previousChapter(ids[1], ids[2])
+    nextChap = nextChapter(ids[1], ids[2])
+
     document.getElementById(DIV_SCRIPTURES).innerHTML = chapterHtml;
+    
+    if (nextChap === undefined || prevChap === undefined) {
+      buttonSpacer = ""
+    }
+    
+    document.getElementsByClassName("divtitle")[0].innerHTML += SINGLE_BOTTOM_PADDING;
+    
+    if (prevChap !== undefined) {
+      
+      let prevButton = htmlLink({
+        classKey: CLASS_BUTTON,
+        content: "Prev",
+        href: `#${ids[0]}:${prevChap[0]}:${prevChap[1]}`,
+        id: "prev"
+      })
+      prevButtonHTML = prevButton + buttonSpacer
+      
+      document.getElementsByClassName("divtitle")[0].innerHTML += prevButtonHTML;
+    }
+
+    if (nextChap !== undefined) {
+      let nextButton = htmlLink({
+        classKey: CLASS_BUTTON,
+        content: "Next",
+        href: `#${ids[0]}:${nextChap[0]}:${nextChap[1]}`,
+        id: "next"
+      })
+      nextButtonHTML = buttonSpacer + nextButton
+
+      document.getElementsByClassName("divtitle")[0].innerHTML += nextButton;
+    }
+
+
 
     setupMarkers();
   };
@@ -276,15 +323,15 @@ const Scriptures = (function () {
       classString = ` class="${parameters.classKey}"`;
     }
 
-    if (parameters.classKey !== undefined) {
+    if (parameters.content !== undefined) {
       contentString = parameters.content;
     }
 
-    if (parameters.classKey !== undefined) {
+    if (parameters.href !== undefined) {
       hrefString = ` href="${parameters.href}"`;
     }
 
-    if (parameters.classKey !== undefined) {
+    if (parameters.id !== undefined) {
       idString = ` id="${parameters.id}"`;
     }
 
@@ -385,6 +432,8 @@ const Scriptures = (function () {
   };
 
   nextChapter = function (bookId, chapter) {
+    chapter = Number(chapter)
+    bookId = Number(bookId)
     let book = books[bookId];
 
     if (book !== undefined) {
@@ -447,7 +496,7 @@ const Scriptures = (function () {
 
     document.querySelectorAll("a[onclick^=\"showLocation(\"]").forEach(function (element) {
       let matches = LAT_LON_PARSER.exec(element.getAttribute("onclick"))
-    
+
       if (matches) {
         let placename = matches[INDEX_PLACENAME];
         let latitude = matches[INDEX_LATITUDE];
@@ -466,9 +515,9 @@ const Scriptures = (function () {
 
   },
 
-  showLocation = function (geotagId, placename, latitude, longitude, viewLatitude, viewLongitude, viewTilt, viewRoll, viewAltitude, viewHeading) {
-    console.log(geotagId, placename, latitude);
-  },
+    showLocation = function (geotagId, placename, latitude, longitude, viewLatitude, viewLongitude, viewTilt, viewRoll, viewAltitude, viewHeading) {
+      console.log(geotagId, placename, latitude);
+    },
 
     titleForBookChapter = function (book, chapter) {
       if (book !== undefined) {
