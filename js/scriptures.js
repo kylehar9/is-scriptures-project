@@ -83,8 +83,8 @@ const Scriptures = (function () {
    */
 
   addMarker = function (placename, latitude, longitude) {
-    //TO-DO: Check to see if we already have this latitude/longitude in gmMarkers array
-    //Add marker to gmMarkers array only if we don't already have one for that location
+    // TO-DO: Check to see if we already have this latitude/longitude in gmMarkers array
+    // Add marker to gmMarkers array only if we don't already have one for that location
     let marker = new google.maps.Marker({
       position: { lat: Number(latitude), lng: Number(longitude) },
       map,
@@ -95,33 +95,33 @@ const Scriptures = (function () {
     // Name we are trying to use... do I already have a name for that marker?
     // Use a substring and compare whether that name is already in there
     gmMarkers.push(marker);
-  },
+  };
 
-    ajax = function (url, successCallback, failureCallback, skipJsonParse) {
-      const request = new XMLHttpRequest();
-      request.open(REQUEST_GET, url, true);
+  ajax = function (url, successCallback, failureCallback, skipJsonParse) {
+    const request = new XMLHttpRequest();
+    request.open(REQUEST_GET, url, true);
 
-      request.onload = function () {
-        if (request.status >= REQUEST_STATUS_OK && request.status < REQUEST_STATUS_ERROR) {
-          const data = (
-            skipJsonParse
-              ? request.response
-              : JSON.parse(request.response)
-          );
+    request.onload = function () {
+      if (request.status >= REQUEST_STATUS_OK && request.status < REQUEST_STATUS_ERROR) {
+        const data = (
+          skipJsonParse
+            ? request.response
+            : JSON.parse(request.response)
+        );
 
-          if (typeof successCallback === "function") {
-            successCallback(data);
-          }
-        } else {
-          if (typeof failureCallback === "function") {
-            failureCallback(request);
-          }
+        if (typeof successCallback === "function") {
+          successCallback(data);
         }
-      };
-
-      request.onerror = failureCallback;
-      request.send();
+      } else {
+        if (typeof failureCallback === "function") {
+          failureCallback(request);
+        }
+      }
     };
+
+    request.onerror = failureCallback;
+    request.send();
+  };
 
   bookChapterValid = function (bookId, chapter) {
     let book = books[bookId];
@@ -211,26 +211,25 @@ const Scriptures = (function () {
     });
 
     gmMarkers = [];
-  },
+  };
 
-    encodedScripturesUrlParameters = function (bookId, chapter, verses, isJst) {
-      if (bookId !== undefined && chapter !== undefined) {
-        let options = "";
+  encodedScripturesUrlParameters = function (bookId, chapter, verses, isJst) {
+    if (bookId !== undefined && chapter !== undefined) {
+      let options = "";
 
-        if (verses !== undefined) {
-          options += verses;
-        }
-
-        if (isJst !== undefined) {
-          options += "&jst=JST";
-        }
-
-        return `${URL_SCRIPTURES}?book=${bookId}&chap=${chapter}&verses${options}`;
+      if (verses !== undefined) {
+        options += verses;
       }
-    };
+
+      if (isJst !== undefined) {
+        options += "&jst=JST";
+      }
+
+      return `${URL_SCRIPTURES}?book=${bookId}&chap=${chapter}&verses${options}`;
+    }
+  };
 
   getScripturesCallback = function (chapterHtml) {
-
     let ids = [];
     let prevChap;
     let nextChap;
@@ -238,29 +237,30 @@ const Scriptures = (function () {
     let prevButtonHTML;
     let nextButtonHTML;
 
-    ids = location.hash.slice(1).split(":")
+    if (location.hash !== "" && location.hash.length > 1) {
+      ids = location.hash.slice(1).split(":");
+    }
 
-    prevChap = previousChapter(ids[1], ids[2])
-    nextChap = nextChapter(ids[1], ids[2])
+    prevChap = previousChapter(ids[1], ids[2]);
+    nextChap = nextChapter(ids[1], ids[2]);
 
     document.getElementById(DIV_SCRIPTURES).innerHTML = chapterHtml;
-    
+
     if (nextChap === undefined || prevChap === undefined) {
-      buttonSpacer = ""
+      buttonSpacer = "";
     }
-    
+
     document.getElementsByClassName("divtitle")[0].innerHTML += SINGLE_BOTTOM_PADDING;
-    
+
     if (prevChap !== undefined) {
-      
       let prevButton = htmlLink({
         classKey: CLASS_BUTTON,
         content: "Prev",
         href: `#${ids[0]}:${prevChap[0]}:${prevChap[1]}`,
         id: "prev"
-      })
-      prevButtonHTML = prevButton + buttonSpacer
-      
+      });
+      prevButtonHTML = prevButton + buttonSpacer;
+
       document.getElementsByClassName("divtitle")[0].innerHTML += prevButtonHTML;
     }
 
@@ -270,13 +270,11 @@ const Scriptures = (function () {
         content: "Next",
         href: `#${ids[0]}:${nextChap[0]}:${nextChap[1]}`,
         id: "next"
-      })
-      nextButtonHTML = buttonSpacer + nextButton
+      });
+      nextButtonHTML = buttonSpacer + nextButton;
 
       document.getElementsByClassName("divtitle")[0].innerHTML += nextButton;
     }
-
-
 
     setupMarkers();
   };
@@ -432,8 +430,8 @@ const Scriptures = (function () {
   };
 
   nextChapter = function (bookId, chapter) {
-    chapter = Number(chapter)
-    bookId = Number(bookId)
+    chapter = Number(chapter);
+    bookId = Number(bookId);
     let book = books[bookId];
 
     if (book !== undefined) {
@@ -490,12 +488,22 @@ const Scriptures = (function () {
   };
 
   setupMarkers = function () {
-    if (gmMarkers.length > 0) {
-      clearMarkers();
+    if (gmMarkers.length > 1) {
+      let bounds = new google.maps.LatLngBounds();
+      for (let i = 0; i < gmMarkers.length; i++) {
+        bounds.extend(gmMarkers[i].position);
+      }
+      map.fitBounds(bounds);
+    } else if (gmMarkers.length <= 0) {
+      map.setCenter({ lat: 31.7683, lng: 35.2137 });
+      map.setZoom(8);
+    } else {
+      map.setCenter(gmMarkers[0].position);
+      map.setZoom(8);
     }
 
     document.querySelectorAll("a[onclick^=\"showLocation(\"]").forEach(function (element) {
-      let matches = LAT_LON_PARSER.exec(element.getAttribute("onclick"))
+      let matches = LAT_LON_PARSER.exec(element.getAttribute("onclick"));
 
       if (matches) {
         let placename = matches[INDEX_PLACENAME];
@@ -503,31 +511,28 @@ const Scriptures = (function () {
         let longitude = matches[INDEX_LONGITUDE];
         let flag = matches[INDEX_FLAG];
 
-
         if (flag !== "") {
           placename = `${placename} ${flag}`;
         }
 
         addMarker(placename, latitude, longitude);
-
       }
     });
+  };
 
-  },
+  showLocation = function (geotagId, placename, latitude, longitude, viewLatitude, viewLongitude, viewTilt, viewRoll, viewAltitude, viewHeading) {
+    console.log(geotagId, placename, latitude);
+  };
 
-    showLocation = function (geotagId, placename, latitude, longitude, viewLatitude, viewLongitude, viewTilt, viewRoll, viewAltitude, viewHeading) {
-      console.log(geotagId, placename, latitude);
-    },
-
-    titleForBookChapter = function (book, chapter) {
-      if (book !== undefined) {
-        if (chapter > 0) {
-          return `${book.tocName} ${chapter}`;
-        }
-
-        return book.tocName;
+  titleForBookChapter = function (book, chapter) {
+    if (book !== undefined) {
+      if (chapter > 0) {
+        return `${book.tocName} ${chapter}`;
       }
-    };
+
+      return book.tocName;
+    }
+  };
 
   volumesGridContent = function (volumeId) {
     let gridContent = "";
