@@ -83,17 +83,40 @@ const Scriptures = (function () {
    */
 
   addMarker = function (placename, latitude, longitude) {
-    // TO-DO: Check to see if we already have this latitude/longitude in gmMarkers array
-    // Add marker to gmMarkers array only if we don't already have one for that location
+    let needNewMarker = true;
+    if (gmMarkers.length > 0) {
+      needNewMarker = gmMarkers.every(function (marker) {
+        let checkLat = marker.getPosition().lat();
+        let checkLng = marker.getPosition().lng();
+
+        if (checkLat === Number(latitude) && checkLng === Number(longitude)) {
+          if (!marker.title === placename) {
+            marker.title += `, ${placename}`;
+          }
+          return false;
+        }
+        return true;
+      });
+    }
+
+    if (needNewMarker === false) {
+      return 0;
+    }
+
     let marker = new google.maps.Marker({
       position: { lat: Number(latitude), lng: Number(longitude) },
       map,
       title: placename,
+      label: placename,
       animation: google.maps.Animation.DROP
     });
 
-    // Name we are trying to use... do I already have a name for that marker?
-    // Use a substring and compare whether that name is already in there
+    // obtained from https://developers.google.com/maps/documentation/javascript/examples/event-simple
+    marker.addListener("click", () => {
+      map.setZoom(8);
+      map.setCenter(marker.getPosition());
+    });
+
     gmMarkers.push(marker);
   };
 
@@ -488,18 +511,8 @@ const Scriptures = (function () {
   };
 
   setupMarkers = function () {
-    if (gmMarkers.length > 1) {
-      let bounds = new google.maps.LatLngBounds();
-      for (let i = 0; i < gmMarkers.length; i++) {
-        bounds.extend(gmMarkers[i].position);
-      }
-      map.fitBounds(bounds);
-    } else if (gmMarkers.length <= 0) {
-      map.setCenter({ lat: 31.7683, lng: 35.2137 });
-      map.setZoom(8);
-    } else {
-      map.setCenter(gmMarkers[0].position);
-      map.setZoom(8);
+    if (gmMarkers.length > 0) {
+      clearMarkers();
     }
 
     document.querySelectorAll("a[onclick^=\"showLocation(\"]").forEach(function (element) {
@@ -518,10 +531,25 @@ const Scriptures = (function () {
         addMarker(placename, latitude, longitude);
       }
     });
+
+    if (gmMarkers.length > 1) {
+      let bounds = new google.maps.LatLngBounds();
+      for (let i = 0; i < gmMarkers.length; i++) {
+        bounds.extend(gmMarkers[i].position);
+      }
+      map.fitBounds(bounds);
+    } else if (gmMarkers.length <= 0) {
+      map.setCenter({ lat: 31.7683, lng: 35.2137 });
+      map.setZoom(8);
+    } else {
+      map.setCenter(gmMarkers[0].position);
+      map.setZoom(8);
+    }
   };
 
   showLocation = function (geotagId, placename, latitude, longitude, viewLatitude, viewLongitude, viewTilt, viewRoll, viewAltitude, viewHeading) {
-    console.log(geotagId, placename, latitude);
+    map.setZoom(viewAltitude);
+    map.setCenter({ lat: latitude, lng: longitude });
   };
 
   titleForBookChapter = function (book, chapter) {
