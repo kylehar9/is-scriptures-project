@@ -19,7 +19,7 @@
   "homepage": "https://github.com/kylehar9/is-scriptures-project#readme",
   "dependencies": {
     "@googlemaps/js-api-loader": "^1.11.1",
-    "eslint": "^7.19.0",
+    "eslint": "^7.20.0",
     "standard": "^16.0.3"
   }
 }

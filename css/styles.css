@@ -271,3 +271,7 @@ span.verse {
 li.match {
     background-color: #ffffcc;
 }
+
+@media (max-width: 700px) {
+    
+}
