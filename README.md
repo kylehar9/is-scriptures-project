@@ -1,3 +1,13 @@
+# Project 2 Learning Notes
+## My Learning Experience
+- Learning & mastering CSS must be more deliberate than other, standard programming languages.  The cascading and puzzle-like nature of it makes it too chaotic to keep organized unless you have a direction in which to head from the get-go.
+
+
+
+
+
+
+
 # Project 1 Learning Notes
 > Note: I think this is a really cool project.  Dr. Liddle has done an amazing job at creating this and teaching us how to do it ourselves.
 ## Things I accomplished
