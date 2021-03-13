@@ -36,7 +36,7 @@
         flex-direction: row;
         justify-content: space-around;
     }
-    #crumbs > ul > li::marker {
+    #crumbs > ul > li::before {
         content: "> ";
     }
 }

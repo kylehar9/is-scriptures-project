@@ -12,6 +12,7 @@ body {
     min-height: 100%;
     font-weight: bold;
     font-size: 10pt;
+    font-family: sans-serif;
 }
 
 img {
@@ -46,11 +47,6 @@ img {
     align-content: stretch;
 }
 
-#crumb {
-    padding-left: 1.25em;
-    order: -1;
-}
-
 #centerhead {
     display: flex;
     flex: 1;
@@ -83,7 +79,7 @@ div.subtitle {
     height: 100%;
     min-height: 100%;
     overflow-x: hidden;
-    overflow-y: auto;
+    overflow-y: hidden;
     border-right: 1px solid #aaa;
     position: relative;
 }
@@ -152,19 +148,6 @@ div.books a.chapter {
     border: solid 5px;
 }
 
-#crumb ul {
-    padding: 0;
-    margin: 0;
-    line-height: 1.0;
-}
-
-#crumb li {
-    padding: 0;
-    margin: 0;
-    list-style: none;
-    display: inline-block;
-}
-
 #header a:link, #header a:visited, #header a:active {
     color: white;
     text-decoration: none;
@@ -173,11 +156,6 @@ div.books a.chapter {
 #header a:hover {
     color: #d0d0ff;
     text-decoration: underline;
-}
-
-#crumb li:not(:first-child)::before {
-    content: ">";
-    padding: .3em;
 }
 
 div.text {
@@ -192,10 +170,10 @@ div.text {
     max-height: 100%;
     overflow-x: hidden;
     overflow-y: auto;
-    font-family: Georgia, 'Times New Roman', Times, serif;
+    font-family: sans-serif;
     font-size: 12pt;
     font-weight: normal;
-    background-color: white;
+    background-color: rgb(236,226,217);
     padding-bottom: 3rem;
 }
 
@@ -272,6 +250,19 @@ li.match {
     background-color: #ffffcc;
 }
 
-@media (max-width: 700px) {
+.books > .btn {
+    border: 2px solid tan;
+    border-radius: 2px;
+    background-color:white;
+    display: block;
+    text-decoration: none;
+    text-align: center;
+    transition-property: box-shadow;
+    transition-duration: 100ms;
+    transition-timing-function: ease-in;
+}
+
+.books > .btn:hover {
+    box-shadow: 2px 2px 5px grey;
     
 }

@@ -1,0 +1,53 @@
+#header {
+    height: 150px;
+}
+
+#centerhead {
+    font-size: x-large;
+}
+
+#crumbs ul {
+    flex-direction: column;
+    padding-left: 0px;
+    margin: 5px;
+}
+
+#crumbs li > a {
+    margin: 5px;
+    list-style: none;
+    background-color: grey;
+    display: block;
+    padding: 6px 8px;
+}
+
+#crumbs li > a:hover {
+    text-decoration: none;
+}
+
+#crumbs li:last-child {
+    margin: 5px;
+    list-style: none;
+    background-color: goldenrod;
+    display: block;
+    padding: 6px 8px;
+}
+
+#content {
+    top: 150px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+#scriptures, #map {
+    order: 0;
+}
+
+#scriptures {
+    min-height: 50%;
+    max-width: none;
+}
+
+#body {
+    min-width: 360px;
+}

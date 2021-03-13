@@ -1,6 +1,12 @@
 # Project 2 Learning Notes
 ## My Learning Experience
 - Learning & mastering CSS must be more deliberate than other, standard programming languages.  The cascading and puzzle-like nature of it makes it too chaotic to keep organized unless you have a direction in which to head from the get-go.
+- As a QA guy, I decided that in future endeavors with fellow software devs, it will be important for me to consider their limits and not assume that because something is not perfect that they should be able to make it such.
+- I discovered that jQuery doesn't work on raw HTML elements - they must be the right kind of JS object (through modules)
+- It's easy to overthink things! Sometimes, even with CSS, the desired solution is just one step away (e.g., figuring out how to eliminate the extra scoll bar by using overflow-y)
+- I found it much more convenient to specify separate css files for the different device sizes (small/large), rather than separating all the different device sizes within a single file using @media queries.
+- I'm beginning to realize just how powerful React.js and SCSS are with functionality and customization - building a static webpage like this using mostly vanilla JS is a lot more picky
+
 
 
 
