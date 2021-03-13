@@ -4,6 +4,7 @@
 
 #centerhead {
     color: cyan;
+    font-size: x-large;
 }
 
 #crumbs ul {
@@ -36,9 +37,14 @@
     top: 150px;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
 }
 
 #scriptures, #map {
     order: 0;
+}
+
+#scriptures {
+    min-height: 50%;
+    max-width: none;
 }
