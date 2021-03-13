@@ -79,7 +79,7 @@ div.subtitle {
     height: 100%;
     min-height: 100%;
     overflow-x: hidden;
-    overflow-y: auto;
+    overflow-y: hidden;
     border-right: 1px solid #aaa;
     position: relative;
 }
@@ -170,10 +170,10 @@ div.text {
     max-height: 100%;
     overflow-x: hidden;
     overflow-y: auto;
-    font-family: Georgia, 'Times New Roman', Times, serif;
+    font-family: sans-serif;
     font-size: 12pt;
     font-weight: normal;
-    background-color: white;
+    background-color: rgb(236,226,217);
     padding-bottom: 3rem;
 }
 

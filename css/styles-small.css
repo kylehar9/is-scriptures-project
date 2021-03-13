@@ -3,7 +3,6 @@
 }
 
 #centerhead {
-    color: cyan;
     font-size: x-large;
 }
 
@@ -47,4 +46,8 @@
 #scriptures {
     min-height: 50%;
     max-width: none;
+}
+
+#body {
+    min-width: 360px;
 }
