@@ -12,6 +12,7 @@ body {
     min-height: 100%;
     font-weight: bold;
     font-size: 10pt;
+    font-family: sans-serif;
 }
 
 img {
@@ -44,11 +45,6 @@ img {
     display: flex;
     flex-direction: row;
     align-content: stretch;
-}
-
-#crumbs {
-    padding-left: 1.25em;
-    order: -1;
 }
 
 #centerhead {
@@ -152,19 +148,6 @@ div.books a.chapter {
     border: solid 5px;
 }
 
-#crumbs ul {
-    padding: 0;
-    margin: 0;
-    line-height: 1.0;
-}
-
-#crumbs li {
-    padding: 0;
-    margin: 0;
-    list-style: none;
-    display: inline-block;
-}
-
 #header a:link, #header a:visited, #header a:active {
     color: white;
     text-decoration: none;
@@ -173,11 +156,6 @@ div.books a.chapter {
 #header a:hover {
     color: #d0d0ff;
     text-decoration: underline;
-}
-
-#crumbs li:not(:first-child)::before {
-    content: ">";
-    padding: .3em;
 }
 
 div.text {

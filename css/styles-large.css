@@ -1,12 +1,26 @@
 #centerhead {
     color: green;
 }
-#crumbs > ul {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    flex-wrap: wrap;
+
+#crumbs ul {
+    padding: 0;
+    margin: 0;
+    line-height: 1.0;
 }
-#crumbs > ul > li::marker {
+
+#crumbs li {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    display: inline-block;
+}
+
+#crumbs li:not(:first-child)::before {
     content: ">";
+    padding: .3em;
+}
+
+#crumbs {
+    padding-left: 1.25em;
+    order: -1;
 }
