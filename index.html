@@ -12,7 +12,8 @@
   <link rel="stylesheet" href="css/main.css">
   <link rel="stylesheet" href="css/normalize.css">
   <link rel="stylesheet" href="css/styles.css">
-  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" media="(max-width:600px)" href="css/styles-small.css">
+  <link rel="stylesheet" media="(min-width:601px)" href="css/styles-large.css">
 
   <meta name="theme-color" content="#fafafa">
 
@@ -24,7 +25,8 @@
     }
   </style>
   <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
-  <script defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBXnzp4L3lxPkUn64KiVxfRTQFX3boFFis&callback=initMap&libraries=&v=weekly"></script>
+  <script defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBXnzp4L3lxPkUn64KiVxfRTQFX3boFFis&callback=initMap&libraries=&v=weekly"></script>
   <script defer src="js/maplabel.js"></script>
   <script src="js/scriptures.js" type="text/javascript"></script>
 
@@ -69,6 +71,8 @@
   </div>
   <div id="content">
     <div id="scriptures"></div>
+      <div id="scripNav1"></div>
+      <div id="scripNav2"></div>
     <div id="map"></div>
   </div>
 
